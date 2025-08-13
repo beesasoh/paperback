@@ -208,8 +208,14 @@ function filenameToTitle(filename) {
         .join(' ');
 }
 
-const booksData = imageFiles.map((file, index) => ({
-    id: index + 1,
+function filenameToSku(filename) {
+    const nameWithoutExt = filename.replace(/\.[^/.]+$/, '');
+    const slug = nameWithoutExt.replace(/_/g, '-').toLowerCase();
+    return `PBK-${slug.toUpperCase()}`;
+}
+
+const booksData = imageFiles.map((file) => ({
+    id: filenameToSku(file),
     title: filenameToTitle(file),
     description: "",
     price: 12.99,
@@ -251,15 +257,15 @@ function renderBooks() {
     booksContainer.innerHTML = booksData.map(book => `
         <div class="col-6 col-sm-4 col-md-3 col-lg-2">
             <div class="card book-card">
-                <div class="cover-wrapper" onclick="openBookDetail(${book.id})">
+                <div class="cover-wrapper" onclick="openBookDetail('${book.id}')">
                     <img src="${book.img}" alt="${book.title}">
                     <span class="badge stock-badge bg-${book.stock ? 'success' : 'danger'}">${book.stock ? 'In Stock' : 'Out of Stock'}</span>
                 </div>
                 <div class="card-body d-flex flex-column">
-                    <h6 class="card-title book-title-link line-clamp-2" onclick="openBookDetail(${book.id})">${book.title}</h6>
+                    <h6 class="card-title book-title-link line-clamp-2" onclick="openBookDetail('${book.id}')">${book.title}</h6>
                     <div class="price-row mt-auto">
                         <span class="fw-bold">$${book.price.toFixed(2)}</span>
-                        <button class="btn btn-sm btn-primary" ${book.stock ? '' : 'disabled'} onclick="addToCart(${book.id})">Add</button>
+                        <button class="btn btn-sm btn-primary" ${book.stock ? '' : 'disabled'} onclick="addToCart('${book.id}')">Add</button>
                     </div>
                 </div>
             </div>
