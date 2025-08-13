@@ -303,6 +303,34 @@ function selectProfile(profileId) {
     document.getElementById('addressInput').value = p.address || '';
 }
 
+function showToast(message) {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1080';
+        document.body.appendChild(container);
+    }
+
+    const toastEl = document.createElement('div');
+    toastEl.className = 'toast align-items-center text-bg-dark border-0';
+    toastEl.setAttribute('role', 'status');
+    toastEl.setAttribute('aria-live', 'polite');
+    toastEl.setAttribute('aria-atomic', 'true');
+    toastEl.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    container.appendChild(toastEl);
+
+    const toast = new bootstrap.Toast(toastEl, { delay: 1800, autohide: true });
+    toast.show();
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+}
+
 function openBookDetail(id) {
     const book = booksData.find(b => b.id === id);
     selectedBookId = id;
@@ -334,6 +362,7 @@ function addToCart(id) {
     if (typeof fbq === 'function') {
         fbq('track', 'AddToCart', { content_id: id, value: book.price, currency: 'USD' });
     }
+    showToast(`${book.title} added to cart.`);
 }
 
 function updateCartCount() {
