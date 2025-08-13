@@ -120,17 +120,37 @@
     <!-- Checkout Section -->
     <div id="checkout" class="d-none">
         <h2>Checkout</h2>
-        <p>Enter your details (simulation only).</p>
+        <p>Select a profile to auto-fill your details, or enter them manually.</p>
+
+        <div id="profiles" class="row g-3 mb-4"></div>
+
         <form onsubmit="purchase(event)">
-            <div class="mb-3">
-                <label>Name</label>
-                <input type="text" class="form-control" required>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">First Name</label>
+                    <input id="firstNameInput" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Last Name</label>
+                    <input id="lastNameInput" type="text" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone Number</label>
+                    <input id="phoneInput" type="tel" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input id="emailInput" type="email" class="form-control" required>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <input id="addressInput" type="text" class="form-control">
+                </div>
             </div>
-            <div class="mb-3">
-                <label>Address</label>
-                <input type="text" class="form-control" required>
+            <div class="mt-3 d-flex gap-2">
+                <button class="btn btn-primary">Complete Purchase</button>
+                <button type="button" class="btn btn-secondary" onclick="showSection('books')">Continue Shopping</button>
             </div>
-            <button class="btn btn-primary">Complete Purchase</button>
         </form>
     </div>
 
@@ -199,6 +219,32 @@ const booksData = imageFiles.map((file, index) => ({
 
 let cart = [];
 let selectedBookId = null;
+const checkoutProfiles = [
+    {
+        id: 'p1',
+        firstName: 'Ava',
+        lastName: 'Ngugi',
+        phone: '+254700111222',
+        email: 'ava.ngugi@prest.com',
+        address: '12 Riverside Dr, Nairobi'
+    },
+    {
+        id: 'p2',
+        firstName: 'Kofi',
+        lastName: 'Mensah',
+        phone: '+233201234567',
+        email: 'kofi.mensah@eectt.com',
+        address: '5 Osu Ave, Accra'
+    },
+    {
+        id: 'p3',
+        firstName: 'Lerato',
+        lastName: 'Mokoena',
+        phone: '+27 82 345 6789',
+        email: 'lerato.mokoena@ejonh.com',
+        address: '41 Main Rd, Johannesburg'
+    }
+];
 
 function renderBooks() {
     const booksContainer = document.getElementById("books");
@@ -219,6 +265,36 @@ function renderBooks() {
             </div>
         </div>
     `).join("");
+}
+
+function renderProfiles() {
+    const profilesContainer = document.getElementById('profiles');
+    if (!profilesContainer) return;
+    profilesContainer.innerHTML = checkoutProfiles.map(p => `
+        <div class="col-12 col-md-4">
+            <div class="card h-100" role="button" onclick="selectProfile('${p.id}')">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <strong>${p.firstName} ${p.lastName}</strong>
+                        <span class="badge text-bg-light">Profile</span>
+                    </div>
+                    <div class="small text-muted">${p.email}</div>
+                    <div class="small">${p.phone}</div>
+                    <div class="small mt-2">${p.address}</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectProfile(profileId) {
+    const p = checkoutProfiles.find(x => x.id === profileId);
+    if (!p) return;
+    document.getElementById('firstNameInput').value = p.firstName;
+    document.getElementById('lastNameInput').value = p.lastName;
+    document.getElementById('phoneInput').value = p.phone;
+    document.getElementById('emailInput').value = p.email;
+    document.getElementById('addressInput').value = p.address || '';
 }
 
 function openBookDetail(id) {
@@ -252,7 +328,6 @@ function addToCart(id) {
     if (typeof fbq === 'function') {
         fbq('track', 'AddToCart', { content_id: id, value: book.price, currency: 'USD' });
     }
-    alert(`${book.title} added to cart.`);
 }
 
 function updateCartCount() {
@@ -268,6 +343,7 @@ function showSection(section) {
     document.getElementById(section).classList.remove("d-none");
 
     if (section === "cart") renderCart();
+    if (section === "checkout") renderProfiles();
 }
 
 function renderCart() {
